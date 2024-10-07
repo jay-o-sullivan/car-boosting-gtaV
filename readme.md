@@ -29,27 +29,28 @@ The **Boosting Tablet** script is an interactive feature designed for QBCore-bas
 
     Run the following SQL command to create the necessary table for storing boosting coins:
 
-    CREATE TABLE `boosting_coins` (
-    `citizenid` VARCHAR(255) NOT NULL,
-    `coins` INT DEFAULT 0,
-    PRIMARY KEY (`citizenid`)
-);
-5. **Ensure Dependencies**: Verify that your fxmanifest.lua includes all required files and dependencies.
+            CREATE TABLE `boosting_coins` (
+            `citizenid` VARCHAR(255) NOT NULL,
+            `coins` INT DEFAULT 0,
+            PRIMARY KEY (`citizenid`)
+           );
+
+6. **Ensure Dependencies**: Verify that your fxmanifest.lua includes all required files and dependencies.
 
 ### Accessing the Boosting Tablet
 
-    Players can access the Boosting Tablet via a specific command or by using an in-game item (this depends on how you configure it in your server).
-    Once opened, the tablet displays the player’s Boosting Coins balance and a list of available boosts.
+Players can access the Boosting Tablet via a specific command or by using an in-game item (this depends on how you configure it in your server).
+Once opened, the tablet displays the player’s Boosting Coins balance and a list of available boosts.
 
 ### Starting a Boost
 
-    Select a boost from the list on the tablet.
-    Confirm the selection, which deducts the required amount of Boosting Coins from the player's balance.
-    Players will receive instructions on completing the boost, including any hacking steps.
+Select a boost from the list on the tablet.
+Confirm the selection, which deducts the required amount of Boosting Coins from the player's balance.
+Players will receive instructions on completing the boost, including any hacking steps.
 
 ### Hacking Process
 
-    Players can utilize physical items (like the GPS Hacking Tool and Engine Hacking Tool) to initiate the hack.
+Players can utilize physical items (like the GPS Hacking Tool and Engine Hacking Tool) to initiate the hack.
     The process includes multiple stages, such as:
         Hacking the engine.
         Scratching the VIN.
@@ -57,11 +58,11 @@ The **Boosting Tablet** script is an interactive feature designed for QBCore-bas
 
 ### Police Notification
 
-    When a player successfully scratches a VIN, all police officers online will receive a notification prompting them to investigate.
+When a player successfully scratches a VIN, all police officers online will receive a notification prompting them to investigate.
 
 ## Customization
 
-    Boost Configurations: Modify available boosts in server/main.lua by adding or removing entries in the availableBoosts table. Example:
+ Boost Configurations: Modify available boosts in server/main.lua by adding or removing entries in the availableBoosts table. Example:
 
     lua
 
@@ -71,20 +72,20 @@ The **Boosting Tablet** script is an interactive feature designed for QBCore-bas
         { id = "boost3", tier = "B", vehicle = "BMW M4", reward = 2500 }
     }
 
-    Coin System: Adjust coin costs and rewards as necessary to balance gameplay within your server.
+Coin System: Adjust coin costs and rewards as necessary to balance gameplay within your server.
 
-    User Interface: Customize the tablet's UI by modifying html/styles.css and html/boosting_tablet.html.
+User Interface: Customize the tablet's UI by modifying html/styles.css and html/boosting_tablet.html.
 
 ### Troubleshooting
 
-    Common Issues:
-        - Ensure your database is properly set up and the script is correctly installed.
-        - Check server logs for any error messages related to the script.
-        - Make sure the police job is correctly configured in the notification system.
+Common Issues:
+- Ensure your database is properly set up and the script is correctly installed.
+- Check server logs for any error messages related to the script.
+- Make sure the police job is correctly configured in the notification system.
 
-    Debugging:
-        - If players are not receiving alerts, verify the job name and ensure  - the alert system is correctly integrated.
-        - Test all functionalities in a controlled environment before deploying them on a live server.
+Debugging:
+- If players are not receiving alerts, verify the job name and ensure  - the alert system is correctly integrated.
+- Test all functionalities in a controlled environment before deploying them on a live server.
 
 ### Issues and Support
 
