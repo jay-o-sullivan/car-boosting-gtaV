@@ -29,15 +29,23 @@ end)
 
 -- Notify the player when the boost starts
 RegisterNetEvent('boosting:client:startBoostMission', function(boost)
-    local spawnLocation = vector3(123.45, 678.90, 21.32) -- Example spawn location
+    -- Generate random spawn location from a predefined list
+    local spawnLocations = {
+        vector3(123.45, 678.90, 21.32),
+        vector3(234.56, 789.01, 30.00),
+        vector3(345.67, 890.12, 40.50)
+    }
+    local randomLocation = spawnLocations[math.random(1, #spawnLocations)]
     local model = GetHashKey(boost.vehicle)
 
+    -- Load the vehicle model
     RequestModel(model)
     while not HasModelLoaded(model) do
         Wait(0)
     end
 
-    local vehicle = CreateVehicle(model, spawnLocation.x, spawnLocation.y, spawnLocation.z, 0.0, true, false)
+    -- Spawn the vehicle at the random location
+    local vehicle = CreateVehicle(model, randomLocation.x, randomLocation.y, randomLocation.z, 0.0, true, false)
     SetEntityAsMissionEntity(vehicle, true, true)
     TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
 
@@ -77,3 +85,21 @@ RegisterNetEvent('boosting:client:scratchVin', function()
         QBCore.Functions.Notify("You don't have a VIN scratcher!", "error")
     end
 end)
+
+-- NUI Callbacks for closing the tablet UI
+RegisterNUICallback('closeTablet', function(data, cb)
+    SetNuiFocus(false, false)
+    cb('ok')
+end)
+
+-- Event triggered after a successful boost
+RegisterNetEvent('boosting:client:successfulBoost', function(boostReward)
+    QBCore.Functions.Notify("Boost successful! You've earned $" .. boostReward, "success")
+end)
+
+-- Event triggered when the player fails to hack (optional)
+RegisterNetEvent('boosting:client:hackFailed', function()
+    QBCore.Functions.Notify("Hack failed! Try again.", "error")
+end)
+
+-- Additional notifications or actions can be implemented here if needed.

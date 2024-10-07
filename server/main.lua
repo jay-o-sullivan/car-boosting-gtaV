@@ -1,13 +1,17 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Retrieve player's Boosting Coin balance
+-- Cooldown tracking
+local cooldowns = {
+    boostCooldown = {},
+    hackGpsCooldown = {},
+    hackEngineCooldown = {},
+    scratchVinCooldown = {}
+}
+
+-- Retrieve player's Boosting Coin balance from the database
 function GetBoostingCoins(citizenid)
     local result = MySQL.Sync.fetchScalar('SELECT coins FROM boosting_coins WHERE citizenid = ?', { citizenid })
-    if result then
-        return result
-    else
-        return 0
-    end
+    return result or 0
 end
 
 -- Add Boosting Coins to player
@@ -45,13 +49,20 @@ RegisterNetEvent('boosting:client:requestBoosts', function()
     TriggerClientEvent('boosting:client:showTablet', src, boostingCoins, availableBoosts)
 end)
 
--- Handle boost selection and start the boost
+-- Handle boost selection and start the boost mission
 RegisterNetEvent('boosting:server:startBoost', function(boostId)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
     local citizenid = player.PlayerData.citizenid
-    local selectedBoost = nil
 
+    -- Check if the player is on cooldown for boosting
+    if cooldowns.boostCooldown[citizenid] and os.time() < cooldowns.boostCooldown[citizenid] then
+        local remainingTime = cooldowns.boostCooldown[citizenid] - os.time()
+        TriggerClientEvent('QBCore:Notify', src, "You must wait " .. remainingTime .. " seconds before boosting again.", "error")
+        return
+    end
+
+    local selectedBoost = nil
     -- Find the selected boost
     for _, boost in ipairs(availableBoosts) do
         if boost.id == boostId then
@@ -65,6 +76,9 @@ RegisterNetEvent('boosting:server:startBoost', function(boostId)
         if DeductBoostingCoins(citizenid, coinsNeeded) then
             TriggerClientEvent('QBCore:Notify', src, "Boost started! Hack the car.", "success")
             TriggerClientEvent('boosting:client:startBoostMission', src, selectedBoost)
+
+            -- Set the cooldown for boosting
+            cooldowns.boostCooldown[citizenid] = os.time() + Config.BoostingCooldown
         else
             TriggerClientEvent('QBCore:Notify', src, "You don't have enough Boosting Coins.", "error")
         end
@@ -85,17 +99,52 @@ end)
 -- Handle hacking steps on the server
 RegisterNetEvent('boosting:server:hackGps', function()
     local src = source
+    local player = QBCore.Functions.GetPlayer(src)
+    local citizenid = player.PlayerData.citizenid
+
+    -- Check if the player is on cooldown for GPS hacking
+    if cooldowns.hackGpsCooldown[citizenid] and os.time() < cooldowns.hackGpsCooldown[citizenid] then
+        local remainingTime = cooldowns.hackGpsCooldown[citizenid] - os.time()
+        TriggerClientEvent('QBCore:Notify', src, "You must wait " .. remainingTime .. " seconds before hacking the GPS again.", "error")
+        return
+    end
+
+    -- Proceed with GPS hacking
+    cooldowns.hackGpsCooldown[citizenid] = os.time() + Config.HackGpsCooldown
     TriggerClientEvent('boosting:client:hackEngine', src)
 end)
 
 RegisterNetEvent('boosting:server:hackEngine', function()
     local src = source
+    local player = QBCore.Functions.GetPlayer(src)
+    local citizenid = player.PlayerData.citizenid
+
+    -- Check if the player is on cooldown for engine hacking
+    if cooldowns.hackEngineCooldown[citizenid] and os.time() < cooldowns.hackEngineCooldown[citizenid] then
+        local remainingTime = cooldowns.hackEngineCooldown[citizenid] - os.time()
+        TriggerClientEvent('QBCore:Notify', src, "You must wait " .. remainingTime .. " seconds before hacking the engine again.", "error")
+        return
+    end
+
+    -- Proceed with engine hacking
+    cooldowns.hackEngineCooldown[citizenid] = os.time() + Config.HackStartCooldown
     TriggerClientEvent('boosting:client:scratchVin', src)
 end)
 
 RegisterNetEvent('boosting:server:scratchVin', function()
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
+    local citizenid = player.PlayerData.citizenid
+
+    -- Check if the player is on cooldown for VIN scratching
+    if cooldowns.scratchVinCooldown[citizenid] and os.time() < cooldowns.scratchVinCooldown[citizenid] then
+        local remainingTime = cooldowns.scratchVinCooldown[citizenid] - os.time()
+        TriggerClientEvent('QBCore:Notify', src, "You must wait " .. remainingTime .. " seconds before scratching VIN again.", "error")
+        return
+    end
+
+    -- Proceed with VIN scratching
+    cooldowns.scratchVinCooldown[citizenid] = os.time() + Config.VinCheckNotify
     TriggerClientEvent('QBCore:Notify', src, "You have successfully scratched the VIN!", "success")
 
     -- Alert cops that the VIN has been scratched
